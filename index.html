@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP N°01 CRM : Programmation des Transformations Homogènes | USTHB M1 AII</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Academic & Modern Engineering Typography (Plus Jakarta Sans, Outfit, JetBrains Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- KaTeX for Publication-Grade LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        display: ['"Outfit"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        pixel: {
+                            bg: '#070B14',
+                            surface: '#0D1322',
+                            card: '#11192C',
+                            border: '#1E293B',
+                            blue: '#3B82F6',
+                            cyan: '#06B6D4',
+                            violet: '#8B5CF6',
+                            purple: '#A855F7',
+                            emerald: '#10B981',
+                            amber: '#F59E0B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070B14;
+            color: #E2E8F0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: 
+                radial-gradient(circle at 12% 10%, rgba(59, 130, 246, 0.12), transparent 35%),
+                radial-gradient(circle at 88% 15%, rgba(139, 92, 246, 0.12), transparent 35%),
+                radial-gradient(circle at 50% 85%, rgba(6, 182, 212, 0.08), transparent 45%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* Smooth Glassmorphism Academic Cards (Google Pixel Dark Aesthetic) */
+        .academic-card {
+            background: rgba(17, 25, 44, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.22);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.7);
+        }
+
+        .academic-card-blue {
+            background: rgba(13, 22, 42, 0.82);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(59, 130, 246, 0.28);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.8);
+        }
+
+        .academic-card-violet {
+            background: rgba(20, 18, 43, 0.82);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(139, 92, 246, 0.30);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px -10px rgba(17, 12, 38, 0.8);
+        }
+
+        .pixel-pill-btn {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+            border: 1px solid rgba(96, 165, 250, 0.4);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.85) 0%, rgba(124, 58, 237, 0.85) 100%);
+            color: #ffffff;
+            border-radius: 0.65rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+        }
+
+        .pixel-pill-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            border-color: rgba(167, 139, 250, 0.7);
+        }
+
+        .tab-active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(139, 92, 246, 0.26) 100%) !important;
+            border-color: rgba(56, 189, 248, 0.65) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 12px rgba(6, 182, 212, 0.18);
+        }
+
+        /* KaTeX Customizations for Dark Academic Readability */
+        .katex {
+            font-size: 1.04em;
+            color: #F8FAFC;
+        }
+        .katex-display {
+            margin: 0.65rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.25rem 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070B14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4F46E5;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: #070B14 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .tp-page-section {
+                display: block !important;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Toast Notification for Clipboard -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transform transition-all duration-300">
+        <div class="academic-card-violet px-4 py-3 flex items-center gap-3 text-sm font-medium text-white shadow-2xl border border-violet-400/50">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span id="toast-msg">Code copié dans le presse-papiers !</span>
+        </div>
+    </div>
+
+    <!-- TOP ACADEMIC HEADER BANNER -->
+    <header class="border-b border-indigo-500/25 bg-[#090E1A]/90 backdrop-blur-xl sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                
+                <!-- Left: Clean Vector Robotics Emblem & Academic Metadata -->
+                <div class="flex items-start sm:items-center gap-4">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 via-indigo-600/20 to-violet-600/25 border border-cyan-400/40 p-2.5 flex-shrink-0 shadow-lg flex items-center justify-center">
+                        <!-- Smooth Modern Vector 3D Coordinate & Manipulator Icon -->
+                        <svg viewBox="0 0 64 64" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="32" cy="32" r="28" stroke="url(#gradRing)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+                            <!-- 3D Coordinate Axes -->
+                            <path d="M32 36V10M32 10L28 15M32 10L36 15" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M32 36L54 46M54 46L48 47.5M54 46L51 40.5" stroke="#818CF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M32 36L12 48M12 48L18 48.5M12 48L14.5 43" stroke="#C084FC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Origin Node -->
+                            <circle cx="32" cy="36" r="4" fill="#38BDF8" stroke="#070B14" stroke-width="1.5"/>
+                            <!-- Transformed Point P -->
+                            <path d="M32 36L46 20" stroke="#F472B6" stroke-width="2" stroke-dasharray="3 2"/>
+                            <circle cx="46" cy="20" r="3.5" fill="#F472B6"/>
+                            <defs>
+                                <linearGradient id="gradRing" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#06B6D4"/>
+                                    <stop offset="1" stop-color="#8B5CF6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span class="px-2.5 py-0.5 text-[11px] font-semibold tracking-wide bg-blue-500/15 text-cyan-300 border border-cyan-500/30 rounded-full">USTHB • Faculté de Génie Électrique</span>
+                            <span class="px-2.5 py-0.5 text-[11px] font-semibold tracking-wide bg-violet-500/15 text-violet-300 border border-violet-500/30 rounded-full">Master 1 AII • Automatique</span>
+                            <span class="px-2.5 py-0.5 text-[11px] font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 rounded-full">Encadré par : Pr. MENANI</span>
+                        </div>
+                        <h1 class="font-display font-bold text-lg sm:text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-violet-300 tracking-tight">
+                            TP N°01 : Programmation des Transformations Homogènes
+                        </h1>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-300 mt-1">
+                            <span>Module : <strong class="text-cyan-300 font-semibold">TP Commande du Robot Manipulateur (CRM)</strong></span>
+                            <span class="text-slate-600 hidden sm:inline">•</span>
+                            <span>Réalisé par : <strong class="text-violet-300 font-semibold">Dahane Ahmed Lamine</strong> &amp; <strong class="text-violet-300 font-semibold">Tabbi Meriem</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Quick Actions -->
+                <div class="flex flex-wrap items-center gap-2.5 no-print self-stretch lg:self-center">
+                    <button onclick="copyAllMatlabCode()" class="pixel-pill-btn px-4 py-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyan-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        <span>Copier Script MATLAB (.m)</span>
+                    </button>
+                    <button onclick="window.print()" class="px-3.5 py-2 rounded-xl text-xs font-display font-semibold border border-slate-700 bg-slate-800/70 text-slate-200 hover:bg-slate-700/80 hover:text-white transition flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        <span>Imprimer / PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAGE FILTER TABS -->
+            <nav class="mt-3.5 pt-3 border-t border-slate-800/80 flex flex-wrap gap-2 no-print" aria-label="Navigation des pages du TP">
+                <button onclick="switchPage('all')" id="tab-all" class="tab-btn tab-active px-3.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/70 bg-slate-900/60 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Rapport Complet (Pages 1 à 4)
+                </button>
+                <button onclick="switchPage('page1')" id="tab-page1" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/70 bg-slate-900/60 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <span class="text-blue-400 font-mono font-semibold">P.01</span> Objectif &amp; Coordonnées Homogènes
+                </button>
+                <button onclick="switchPage('page2')" id="tab-page2" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/70 bg-slate-900/60 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <span class="text-violet-400 font-mono font-semibold">P.02</span> Changement de Repère &amp; Translation
+                </button>
+                <button onclick="switchPage('page3')" id="tab-page3" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/70 bg-slate-900/60 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <span class="text-cyan-400 font-mono font-semibold">P.03</span> Matrices de Rotation ($X, Y, Z$)
+                </button>
+                <button onclick="switchPage('page4')" id="tab-page4" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/70 bg-slate-900/60 text-slate-300 hover:text-white transition flex items-center gap-2">
+                    <span class="text-emerald-400 font-mono font-semibold">P.04</span> Travail Demandé, Solutions MATLAB &amp; 3D
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-14 flex-grow w-full">
+
+        <!-- =====================================================================
+             PAGE 1 : OBJECTIF DU TP & REPRÉSENTATION D'UN POINT (HOMOGÈNE)
+             ===================================================================== -->
+        <section id="section-page1" class="tp-page-section space-y-6">
+            <div class="flex items-center justify-between border-b border-blue-500/30 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-blue-600/20 text-blue-300 border border-blue-500/40 font-display font-bold text-xs rounded-lg">PAGE 1 / 4</span>
+                    <h2 class="font-display font-bold text-base sm:text-lg text-white tracking-tight">
+                        1. Objectif du TP &amp; 2. Représentation Homogène d'un Point
+                    </h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline">USTHB / FGE — TP CRM M1 AII — Page 1</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- LEFT COLUMN: Polycopié Page 1 (7 cols) -->
+                <div class="lg:col-span-7 academic-card p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+                        <div class="text-xs text-slate-300 space-y-0.5">
+                            <p class="font-semibold text-blue-300">Université des Sciences et de la Technologie HOUARI BOUMEDIENE — USTHB</p>
+                            <p>Faculté de Génie Électrique (FGE) — Département d'Automatique</p>
+                            <p>Spécialité : Automatique | Niveau : <span class="text-cyan-300 font-medium">M1 AII</span> | Module : <span class="text-violet-300 font-medium">TP Commande du robot manipulateur</span></p>
+                        </div>
+                        <span class="px-2.5 py-1 text-[11px] font-medium bg-blue-950/80 border border-blue-500/30 text-blue-300 rounded-md flex-shrink-0">Rappel Théorique</span>
+                    </div>
+
+                    <!-- 1. Objectif du TP -->
+                    <div class="space-y-2">
+                        <h3 class="font-display font-bold text-cyan-300 text-base flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span> 1. Objectif du TP
+                        </h3>
+                        <p class="text-sm text-slate-200 leading-relaxed pl-4 border-l-2 border-cyan-500/50">
+                            Le but de ce TP est de programmer des fonctions sous <strong>MATLAB</strong> qui permettent de définir les rotations autour des trois axes, et de vérifier les propriétés de la matrice de rotation. Par la suite, manipuler les transformations homogènes à l'aide des matrices de rotation déjà développées.
+                        </p>
+                    </div>
+
+                    <!-- 2. Rappel théorique -->
+                    <div class="space-y-3">
+                        <h3 class="font-display font-bold text-violet-300 text-base flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-violet-400 inline-block"></span> 2. Rappel théorique
+                        </h3>
+                        <div class="pl-4 space-y-2">
+                            <h4 class="font-display font-semibold text-blue-300 text-sm">2.1 Matrices de transformation homogènes [2]</h4>
+                            <p class="text-sm text-slate-300">La notion de transformation de repère est fondamentale en robotique, elle permet :</p>
+                            <ul class="text-sm text-slate-200 space-y-1.5 list-none pl-1">
+                                <li class="flex items-start gap-2.5"><span class="text-cyan-400 font-bold">▸</span> <span>D'exprimer les situations (positions et orientations) des différents corps du robot les uns par rapport aux autres.</span></li>
+                                <li class="flex items-start gap-2.5"><span class="text-cyan-400 font-bold">▸</span> <span>De spécifier les situations que doit prendre le repère associé à l'organe terminal du robot pour réaliser une tâche donnée.</span></li>
+                                <li class="flex items-start gap-2.5"><span class="text-cyan-400 font-bold">▸</span> <span>De décrire et de contrôler les efforts mis en jeu lorsque le robot interagit avec son environnement.</span></li>
+                                <li class="flex items-start gap-2.5"><span class="text-cyan-400 font-bold">▸</span> <span>D'intégrer à la commande les informations sensorielles issues de capteurs ayant chacun son système de référence propre.</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- 2.2 Représentation d'un point -->
+                        <div class="pl-4 pt-2 space-y-3">
+                            <h4 class="font-display font-semibold text-blue-300 text-sm">2.2 Représentation d'un point</h4>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Soit $P$ un point de coordonnées cartésiennes $p_x, p_y, p_z$ (Figure 1). On appelle <strong>coordonnées homogènes</strong> du point $P$ les termes $w \cdot p_x,\; w \cdot p_y,\; w \cdot p_z$ et $w$, où $w$ est un facteur d'échelle égal à $1$ en robotique ($w = 1$). On représente alors les coordonnées homogènes d'un point par le vecteur colonne $(4 \times 1)$ :
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center bg-[#090E1C] p-4 rounded-xl border border-slate-800">
+                                <div class="text-center">
+                                    $$p = \begin{bmatrix} p_x \\ p_y \\ p_z \\ 1 \end{bmatrix} = \begin{bmatrix} p_x & p_y & p_z & 1 \end{bmatrix}^T$$
+                                    <p class="text-xs text-slate-400 mt-1">Représentation vectorielle dans $\mathbb{R}^4$</p>
+                                </div>
+
+                                <!-- Interactive Figure 1 Canvas Wrapper -->
+                                <div class="flex flex-col items-center">
+                                    <canvas id="canvasFig1" width="280" height="195" class="bg-[#060913] border border-slate-800 rounded-lg"></canvas>
+                                    <span class="text-[11px] text-slate-400 mt-1.5">Figure 1 : Représentation d'un point $P(p_x, p_y, p_z)$</span>
+                                </div>
+                            </div>
+
+                            <!-- Sliders for Figure 1 Live Point Manipulation -->
+                            <div class="bg-[#0B1120] p-3 rounded-xl border border-indigo-500/20 flex flex-wrap items-center justify-between gap-3 text-xs">
+                                <span class="text-cyan-300 font-semibold">Coordonnées de $P$ :</span>
+                                <label class="flex items-center gap-2 font-mono">
+                                    $p_x$: <input type="range" id="fig1_px" min="0.5" max="4" step="0.5" value="2.5" class="accent-cyan-400 w-20" oninput="drawFig1()">
+                                    <span id="fig1_px_val" class="text-cyan-300 w-6">2.5</span>
+                                </label>
+                                <label class="flex items-center gap-2 font-mono">
+                                    $p_y$: <input type="range" id="fig1_py" min="0.5" max="4" step="0.5" value="3.0" class="accent-violet-400 w-20" oninput="drawFig1()">
+                                    <span id="fig1_py_val" class="text-violet-300 w-6">3.0</span>
+                                </label>
+                                <label class="flex items-center gap-2 font-mono">
+                                    $p_z$: <input type="range" id="fig1_pz" min="0.5" max="4" step="0.5" value="2.5" class="accent-emerald-400 w-20" oninput="drawFig1()">
+                                    <span id="fig1_pz_val" class="text-emerald-300 w-6">2.5</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Physical & Kinematic Analysis (5 cols) -->
+                <div class="lg:col-span-5 academic-card-violet p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-violet-500/30 pb-3">
+                        <h3 class="font-display font-bold text-sm sm:text-base text-violet-200 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-violet-400"></span>
+                            Interprétation Physique &amp; Analyse Cinématique
+                        </h3>
+                        <span class="px-2 py-0.5 text-[11px] font-mono bg-violet-950/80 text-violet-300 rounded border border-violet-500/30">Page 1</span>
+                    </div>
+
+                    <!-- Why w = 1 in Robotics? -->
+                    <div class="bg-[#0D1226]/90 border-l-4 border-cyan-400 p-4 rounded-r-xl space-y-2">
+                        <h4 class="font-display font-semibold text-cyan-300 text-sm">
+                            Justification du passage aux coordonnées homogènes ($w = 1$)
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Dans l'espace cartésien tridimensionnel $\mathbb{R}^3$, le déplacement d'un corps rigide combine une <strong>rotation</strong> $R \in SO(3)$ $(3\times 3)$ et une <strong>translation</strong> $t \in \mathbb{R}^3$ $(3\times 1)$ selon une transformation <em>affine</em> non linéaire :
+                        </p>
+                        <div class="bg-[#070A16] p-2 rounded-lg text-center border border-slate-800">
+                            $$P' = R \cdot P + t$$
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Pour un bras manipulateur série à $n$ degrés de liberté (ex. $n = 6$), exprimer la position de l'organe terminal dans le repère de base $R_0$ nécessiterait d'imbriquer des sommes et des produits matriciels :
+                            $$P_0 = R_{01}\big(R_{12}(R_{23} P_3 + t_{23}) + t_{12}\big) + t_{01}$$
+                        </p>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                            L'introduction de la 4<sup>ème</sup> coordonnée $w = 1$ linéarise cette relation dans $\mathbb{R}^4$ : la composition de plusieurs mouvements successifs se réduit à un <strong>unique produit matriciel $(4\times 4)$</strong> :
+                            $$P_0 = {}^0T_1 \cdot {}^1T_2 \cdot {}^2T_3 \cdots {}^{n-1}T_n \cdot P_n$$
+                        </p>
+                    </div>
+
+                    <!-- Point (w=1) vs Free Vector (w=0) -->
+                    <div class="bg-[#0D1226]/90 border-l-4 border-violet-400 p-4 rounded-r-xl space-y-2">
+                        <h4 class="font-display font-semibold text-violet-300 text-sm">
+                            Distinction physique : Point matériel ($w = 1$) vs Vecteur libre ($w = 0$)
+                        </h4>
+                        <ul class="text-xs sm:text-sm text-slate-300 space-y-2">
+                            <li>
+                                <strong class="text-emerald-400">▸ Cas $w = 1$ (Point géométrique $P$) :</strong> Ses coordonnées dépendent du choix de l'origine du repère. Par produit avec ${}^iT_j$, il subit à la fois la rotation $R$ et la translation $t$ :
+                                $$\begin{bmatrix} R & t \\ 0 & 1 \end{bmatrix} \begin{bmatrix} P \\ 1 \end{bmatrix} = \begin{bmatrix} R \cdot P + t \\ 1 \end{bmatrix}$$
+                            </li>
+                            <li>
+                                <strong class="text-cyan-400">▸ Cas $w = 0$ (Vecteur libre / directionnel $\vec{u}$) :</strong> Un vecteur directeur (axe d'articulation, vecteur vitesse) est invariant par translation de l'origine. En posant $w = 0$, la translation $t$ est annulée ($t \times 0 = 0$) et seule la rotation agit :
+                                $$\begin{bmatrix} R & t \\ 0 & 1 \end{bmatrix} \begin{bmatrix} \vec{u} \\ 0 \end{bmatrix} = \begin{bmatrix} R \cdot \vec{u} \\ 0 \end{bmatrix}$$
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             PAGE 2 : TRANSFORMATIONS DE REPÈRES & TRANSLATION PURE
+             ===================================================================== -->
+        <section id="section-page2" class="tp-page-section space-y-6">
+            <div class="flex items-center justify-between border-b border-violet-500/30 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-violet-600/20 text-violet-300 border border-violet-500/40 font-display font-bold text-xs rounded-lg">PAGE 2 / 4</span>
+                    <h2 class="font-display font-bold text-base sm:text-lg text-white tracking-tight">
+                        2.3 Transformations Homogènes des Repères &amp; 2.4 Translation Pure
+                    </h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline">USTHB / FGE — TP CRM M1 AII — Page 2</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- LEFT COLUMN: Polycopié Page 2 (7 cols) -->
+                <div class="lg:col-span-7 academic-card p-6 space-y-5">
+                    
+                    <!-- 2.3 Transformations homogènes des repères -->
+                    <div class="space-y-3">
+                        <h3 class="font-display font-bold text-cyan-300 text-base flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span> 2.3 Transformations homogènes des repères
+                        </h3>
+                        <p class="text-sm text-slate-200 leading-relaxed">
+                            Faisons subir une transformation quelconque, de translation et/ou de rotation au repère $R_i$, une transformation qui l'amène sur le repère $R_j$ (Figure 2). Cette transformation est définie par la matrice ${}^iT_j$ appelée <strong>matrice de transformation homogène</strong>, de dimension $(4 \times 4)$, telle que :
+                        </p>
+
+                        <!-- Matrix Equation ^i T_j -->
+                        <div class="bg-[#090E1C] p-4 rounded-xl border border-slate-800 overflow-x-auto text-center">
+                            $${}^iT_j = \begin{bmatrix} s_x & n_x & a_x & p_x \\ s_y & n_y & a_y & p_y \\ s_z & n_z & a_z & p_z \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} {}^iA_j & {}^iP_j \\ \begin{matrix} 0 & 0 & 0 \end{matrix} & 1 \end{bmatrix} = \begin{bmatrix} {}^is_j & {}^in_j & {}^ia_j & {}^iP_j \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                        </div>
+
+                        <p class="text-sm text-slate-200 leading-relaxed">
+                            Où ${}^is_j$, ${}^in_j$ et ${}^ia_j$ désignent respectivement les <strong>vecteurs unitaires</strong> suivant les axes $x_j, y_j$ et $z_j$ du repère $R_j$ exprimés dans le repère $R_i$, et où ${}^iP_j$ est le vecteur $(3\times 1)$ exprimant les coordonnées de l'origine du repère $R_j$ dans le repère $R_i$.
+                        </p>
+
+                        <!-- Figure 2 Clean Vector SVG Diagram -->
+                        <div class="bg-[#070B16] border border-slate-800 rounded-xl p-4 flex flex-col items-center">
+                            <svg viewBox="0 0 500 180" class="w-full max-w-md h-auto">
+                                <defs>
+                                    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                        <path d="M0,0 L0,6 L7,3 z" fill="#22d3ee"/>
+                                    </marker>
+                                    <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                        <path d="M0,0 L0,6 L7,3 z" fill="#c084fc"/>
+                                    </marker>
+                                    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                        <path d="M0,0 L0,6 L7,3 z" fill="#fbbf24"/>
+                                    </marker>
+                                </defs>
+                                <!-- Frame R_i -->
+                                <g transform="translate(95, 120)">
+                                    <line x1="0" y1="0" x2="0" y2="-85" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrowCyan)"/>
+                                    <line x1="0" y1="0" x2="90" y2="0" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrowCyan)"/>
+                                    <line x1="0" y1="0" x2="-45" y2="48" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrowCyan)"/>
+                                    <circle cx="0" cy="0" r="3.5" fill="#22d3ee"/>
+                                    <text x="-35" y="-25" fill="#22d3ee" font-family="Plus Jakarta Sans" font-weight="700" font-size="14">Rᵢ</text>
+                                    <text x="8" y="-78" fill="#e2e8f0" font-family="JetBrains Mono" font-size="12">zᵢ</text>
+                                    <text x="95" y="5" fill="#e2e8f0" font-family="JetBrains Mono" font-size="12">yᵢ</text>
+                                    <text x="-62" y="55" fill="#e2e8f0" font-family="JetBrains Mono" font-size="12">xᵢ</text>
+                                </g>
+                                <!-- Frame R_j -->
+                                <g transform="translate(365, 65)">
+                                    <line x1="0" y1="0" x2="65" y2="-42" stroke="#c084fc" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+                                    <line x1="0" y1="0" x2="28" y2="68" stroke="#c084fc" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+                                    <line x1="0" y1="0" x2="-68" y2="-32" stroke="#c084fc" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+                                    <circle cx="0" cy="0" r="3.5" fill="#c084fc"/>
+                                    <text x="45" y="18" fill="#c084fc" font-family="Plus Jakarta Sans" font-weight="700" font-size="14">Rⱼ</text>
+                                    <text x="72" y="-42" fill="#e2e8f0" font-family="JetBrains Mono" font-size="12">zⱼ</text>
+                                    <text x="36" y="74" fill="#e2e8f0" font-family="JetBrains Mono" font-size="12">yⱼ</text>
+                                    <text x="-88" y="-32" fill="#e2e8f0" font-family="JetBrains Mono" font-size="12">xⱼ</text>
+                                </g>
+                                <!-- Curved Transformation Arrow ^i T_j -->
+                                <path d="M 135 145 Q 250 175 345 95" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arrowAmber)"/>
+                                <text x="235" y="162" fill="#fbbf24" font-family="JetBrains Mono" font-weight="700" font-size="14">ⁱTⱼ</text>
+                            </svg>
+                            <span class="text-[11px] text-slate-400">Figure 2 : Passage du repère $R_i$ au repère $R_j$ par la matrice homogène ${}^iT_j$</span>
+                        </div>
+                    </div>
+
+                    <!-- 2.4 Matrice de transformation de translation pure -->
+                    <div class="space-y-3 pt-3 border-t border-slate-800">
+                        <h3 class="font-display font-bold text-violet-300 text-base flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-violet-400 inline-block"></span> 2.4 Matrice de transformation de translation pure
+                        </h3>
+                        <p class="text-sm text-slate-200 leading-relaxed">
+                            Soit $\text{Trans}(a, b, c)$ cette transformation, où $a, b$ et $c$ désignent les composantes de la translation le long des axes $x, y$ et $z$ respectivement. L'orientation étant conservée dans cette transformation (${}^iA_j = I_3$), $\text{Trans}(a, b, c)$ a pour expression (Figure 3) :
+                        </p>
+
+                        <div class="bg-[#090E1C] p-4 rounded-xl border border-slate-800 text-center">
+                            $${}^iT_j = \text{Trans}(a, b, c) = \begin{bmatrix} 1 & 0 & 0 & a \\ 0 & 1 & 0 & b \\ 0 & 0 & 1 & c \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                        </div>
+
+                        <div class="bg-[#0C1326] p-3.5 rounded-xl border border-indigo-500/25 text-sm text-slate-200">
+                            Ainsi, la matrice $\text{Trans}(a, b, c)$ se décompose en un produit de trois translations élémentaires :
+                            $$\text{Trans}(a, b, c) = \text{Trans}(x, a) \cdot \text{Trans}(y, b) \cdot \text{Trans}(z, c)$$
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Mathematical & Block-Partition Analysis (5 cols) -->
+                <div class="lg:col-span-5 academic-card-violet p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-violet-500/30 pb-3">
+                        <h3 class="font-display font-bold text-sm sm:text-base text-violet-200 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                            Analyse Mathématique &amp; Structure par Blocs
+                        </h3>
+                        <span class="px-2 py-0.5 text-[11px] font-mono bg-violet-950/80 text-violet-300 rounded border border-violet-500/30">Page 2</span>
+                    </div>
+
+                    <!-- Physical Meaning of Columns s, n, a, P -->
+                    <div class="bg-[#0D1226]/90 border-l-4 border-cyan-400 p-4 rounded-r-xl space-y-2.5">
+                        <h4 class="font-display font-semibold text-cyan-300 text-sm">
+                            Signification géométrique des vecteurs colonnes $(\vec{s}, \vec{n}, \vec{a}, \vec{P})$
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Dans la littérature robotique (notamment pour décrire la pose de l'organe terminal / pince), les colonnes de la matrice homogène ${}^iT_j$ représentent directement les cosinus directeurs des axes de $R_j$ projetés dans $R_i$ :
+                        </p>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2.5 bg-[#070B16] rounded-lg border border-rose-500/25">
+                                <span class="font-mono font-semibold text-rose-400">1<sup>ère</sup> colonne ${}^is_j = [s_x, s_y, s_z]^T$ :</span>
+                                <span class="text-slate-300 block mt-0.5">Vecteur unitaire de l'axe $\vec{x}_j$ exprimé dans $R_i$.</span>
+                            </div>
+                            <div class="p-2.5 bg-[#070B16] rounded-lg border border-emerald-500/25">
+                                <span class="font-mono font-semibold text-emerald-400">2<sup>ème</sup> colonne ${}^in_j = [n_x, n_y, n_z]^T$ :</span>
+                                <span class="text-slate-300 block mt-0.5">Vecteur unitaire de l'axe $\vec{y}_j$ exprimé dans $R_i$ (direction d'ouverture/fermeture des mors de la pince).</span>
+                            </div>
+                            <div class="p-2.5 bg-[#070B16] rounded-lg border border-cyan-500/25">
+                                <span class="font-mono font-semibold text-cyan-400">3<sup>ème</sup> colonne ${}^ia_j = [a_x, a_y, a_z]^T$ :</span>
+                                <span class="text-slate-300 block mt-0.5">Vecteur unitaire de l'axe $\vec{z}_j$ exprimé dans $R_i$ (vecteur d'<em>approche</em> de l'outil vers la cible).</span>
+                            </div>
+                            <div class="p-2.5 bg-[#070B16] rounded-lg border border-amber-500/25">
+                                <span class="font-mono font-semibold text-amber-300">4<sup>ème</sup> colonne ${}^iP_j = [p_x, p_y, p_z]^T$ :</span>
+                                <span class="text-slate-300 block mt-0.5">Vecteur position de l'origine $O_j$ mesuré par rapport à l'origine $O_i$.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typo Correction & Commutativity -->
+                    <div class="bg-[#0D1226]/90 border-l-4 border-amber-400 p-4 rounded-r-xl space-y-2">
+                        <h4 class="font-display font-semibold text-amber-300 text-sm">
+                            Remarque sur la décomposition de $\text{Trans}(a, b, c)$ et commutativité
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Au bas de la page 2 du polycopié, l'expression comporte une coquille typographique répétant l'axe $x$ ($\text{Trans}(x,a)\cdot\text{Trans}(x,b)\cdot\text{Trans}(x,c)$). La formulation exacte décompose la translation suivant les trois axes respectifs $x$, $y$ et $z$ :
+                            $$\text{Trans}(a, b, c) = \text{Trans}(x, a) \cdot \text{Trans}(y, b) \cdot \text{Trans}(z, c)$$
+                        </p>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                            Par ailleurs, contrairement aux rotations 3D qui ne sont pas commutatives, <strong>le produit de translations pures est commutatif</strong> car la sous-matrice de rotation vaut $I_3$, ce qui additionne simplement les vecteurs de translation dans la 4<sup>ème</sup> colonne.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             PAGE 3 : MATRICES DE ROTATION AUTOUR DES AXES PRINCIPAUX (X, Y, Z)
+             ===================================================================== -->
+        <section id="section-page3" class="tp-page-section space-y-6">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 font-display font-bold text-xs rounded-lg">PAGE 3 / 4</span>
+                    <h2 class="font-display font-bold text-base sm:text-lg text-white tracking-tight">
+                        2.5 Matrices de Transformation de Rotation autour des Axes Principaux
+                    </h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline">USTHB / FGE — TP CRM M1 AII — Page 3</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- LEFT COLUMN: Polycopié Page 3 (7 cols) -->
+                <div class="lg:col-span-7 academic-card p-6 space-y-5">
+                    
+                    <!-- Figure 3 Diagram (Translation pure) -->
+                    <div class="bg-[#070B16] border border-slate-800 rounded-xl p-3.5 flex flex-col items-center">
+                        <svg viewBox="0 0 480 160" class="w-full max-w-md h-auto">
+                            <g transform="translate(90, 105)">
+                                <line x1="0" y1="0" x2="0" y2="-80" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+                                <line x1="0" y1="0" x2="290" y2="0" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+                                <line x1="0" y1="0" x2="-45" y2="48" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+                                <text x="8" y="-72" fill="#38bdf8" font-family="JetBrains Mono" font-size="12">zᵢ</text>
+                                <text x="295" y="4" fill="#38bdf8" font-family="JetBrains Mono" font-size="12">yᵢ</text>
+                                <text x="-65" y="52" fill="#38bdf8" font-family="JetBrains Mono" font-size="12">xᵢ</text>
+                                <!-- Projections a, b, c -->
+                                <line x1="-26" y1="28" x2="164" y2="28" stroke="#64748b" stroke-dasharray="3,3"/>
+                                <line x1="190" y1="0" x2="164" y2="28" stroke="#64748b" stroke-dasharray="3,3"/>
+                                <line x1="164" y1="28" x2="164" y2="-45" stroke="#fbbf24" stroke-dasharray="3,3"/>
+                                <text x="-40" y="30" fill="#fbbf24" font-family="JetBrains Mono" font-size="13" font-weight="bold">a</text>
+                                <text x="195" y="-5" fill="#fbbf24" font-family="JetBrains Mono" font-size="13" font-weight="bold">b</text>
+                                <text x="170" y="-8" fill="#fbbf24" font-family="JetBrains Mono" font-size="13" font-weight="bold">c</text>
+                            </g>
+                            <g transform="translate(254, 60)">
+                                <line x1="0" y1="0" x2="0" y2="-48" stroke="#c084fc" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+                                <line x1="0" y1="0" x2="85" y2="0" stroke="#c084fc" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+                                <line x1="0" y1="0" x2="-32" y2="35" stroke="#c084fc" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
+                                <text x="8" y="-42" fill="#c084fc" font-family="JetBrains Mono" font-size="12">zⱼ</text>
+                                <text x="90" y="4" fill="#c084fc" font-family="JetBrains Mono" font-size="12">yⱼ</text>
+                                <text x="-50" y="40" fill="#c084fc" font-family="JetBrains Mono" font-size="12">xⱼ</text>
+                            </g>
+                        </svg>
+                        <span class="text-[11px] text-slate-400">Figure 3 : Transformation de translation pure $\text{Trans}(a, b, c)$ — conservation de l'orientation des axes</span>
+                    </div>
+
+                    <h3 class="font-display font-bold text-cyan-300 text-base">
+                        2.5 Matrices de transformation de rotation autour des axes principaux [2]
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        En notant $c\theta = \cos(\theta)$ et $s\theta = \sin(\theta)$ pour alléger l'écriture matricielle :
+                    </p>
+
+                    <!-- A. Rotation autour de X -->
+                    <div class="bg-[#090E1C] p-4 rounded-xl border border-rose-500/30 space-y-2">
+                        <h4 class="font-display font-semibold text-rose-300 text-sm">A. Une rotation $\theta$ autour de l'axe $x$ : $\text{Rot}(x, \theta)$</h4>
+                        <p class="text-xs text-slate-300">
+                            Les vecteurs unitaires de $R_j$ exprimés dans $R_i$ s'écrivent ${}^is_j = [1, 0, 0, 0]^T$, ${}^in_j = [0, c\theta, s\theta, 0]^T$ et ${}^ia_j = [0, -s\theta, c\theta, 0]^T$ :
+                        </p>
+                        <div class="overflow-x-auto">
+                            $${}^iT_j = \text{Rot}(x, \theta) = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta & 0 \\ 0 & \sin\theta & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \implies R_x(\theta) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta \\ 0 & \sin\theta & \cos\theta \end{bmatrix}$$
+                        </div>
+                    </div>
+
+                    <!-- B. Rotation autour de Y -->
+                    <div class="bg-[#090E1C] p-4 rounded-xl border border-emerald-500/30 space-y-2">
+                        <h4 class="font-display font-semibold text-emerald-300 text-sm">B. Une rotation $\theta$ autour de l'axe $y$ : $\text{Rot}(y, \theta)$</h4>
+                        <div class="overflow-x-auto">
+                            $${}^iT_j = \text{Rot}(y, \theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta & 0 \\ 0 & 1 & 0 & 0 \\ -\sin\theta & 0 & \cos\theta & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \implies R_y(\theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{bmatrix}$$
+                        </div>
+                    </div>
+
+                    <!-- C. Rotation autour de Z -->
+                    <div class="bg-[#090E1C] p-4 rounded-xl border border-cyan-500/30 space-y-2">
+                        <h4 class="font-display font-semibold text-cyan-300 text-sm">C. Une rotation $\theta$ autour de l'axe $z$ : $\text{Rot}(z, \theta)$</h4>
+                        <div class="overflow-x-auto">
+                            $${}^iT_j = \text{Rot}(z, \theta) = \begin{bmatrix} \cos\theta & -\sin\theta & 0 & 0 \\ \sin\theta & \cos\theta & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \implies R_z(\theta) = \begin{bmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: Geometric Justification & Right-Hand Rule (5 cols) -->
+                <div class="lg:col-span-5 academic-card-violet p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-violet-500/30 pb-3">
+                        <h3 class="font-display font-bold text-sm sm:text-base text-violet-200 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            Développement Géométrique &amp; Règle de la Main Droite
+                        </h3>
+                        <span class="px-2 py-0.5 text-[11px] font-mono bg-violet-950/80 text-violet-300 rounded border border-violet-500/30">Page 3</span>
+                    </div>
+
+                    <div class="bg-[#0D1226]/90 border-l-4 border-emerald-400 p-4 rounded-r-xl space-y-2.5">
+                        <h4 class="font-display font-semibold text-emerald-300 text-sm">
+                            Justification de l'inversion des signes de $\sin\theta$ dans $R_y(\theta)$
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Dans un repère orthonormé direct $(O, \vec{x}, \vec{y}, \vec{z})$, le produit vectoriel suit la permutation circulaire directe $\vec{x} \to \vec{y} \to \vec{z} \to \vec{x}$ :
+                        </p>
+                        <ul class="text-xs sm:text-sm text-slate-300 space-y-2 list-disc pl-4">
+                            <li>
+                                <strong>Autour de $\vec{x}$ :</strong> $\vec{y} \wedge \vec{z} = +\vec{x}$. Une rotation positive amène $\vec{y}_j$ vers $+\vec{z}_i$, donc $\vec{y}_j = \cos\theta\,\vec{y}_i + \sin\theta\,\vec{z}_i$ et $\vec{z}_j = -\sin\theta\,\vec{y}_i + \cos\theta\,\vec{z}_i$.
+                            </li>
+                            <li>
+                                <strong>Autour de $\vec{z}$ :</strong> $\vec{x} \wedge \vec{y} = +\vec{z}$. Une rotation positive amène $\vec{x}_j$ vers $+\vec{y}_i$, donc $\vec{x}_j = \cos\theta\,\vec{x}_i + \sin\theta\,\vec{y}_i$ et $\vec{y}_j = -\sin\theta\,\vec{x}_i + \cos\theta\,\vec{y}_i$.
+                            </li>
+                            <li>
+                                <strong>Autour de $\vec{y}$ :</strong> L'ordre direct est $\vec{z} \wedge \vec{x} = +\vec{y}$ (et non $\vec{x} \wedge \vec{z}$). Une rotation positive autour de $\vec{y}$ fait donc basculer l'axe $\vec{z}_j$ (3<sup>ème</sup> colonne) vers $+\vec{x}_i$ (1<sup>ère</sup> ligne) et l'axe $\vec{x}_j$ (1<sup>ère</sup> colonne) vers $-\vec{z}_i$ (3<sup>ème</sup> ligne) :
+                                $${}^is_j = \begin{bmatrix} \cos\theta \\ 0 \\ -\sin\theta \end{bmatrix}, \quad {}^ia_j = \begin{bmatrix} +\sin\theta \\ 0 \\ \cos\theta \end{bmatrix}$$
+                                C'est ce qui explique la présence de $+\sin\theta$ en position $(1,3)$ et $-\sin\theta$ en position $(3,1)$ dans $R_y(\theta)$.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Interactive Quick Angle Tester for Page 3 -->
+                    <div class="bg-[#090E1C] border border-indigo-500/30 rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-display font-semibold text-xs text-cyan-300">Évaluateur numérique des matrices $R_x, R_y, R_z$</span>
+                            <select id="p3_angle_preset" onchange="updateP3Calculator()" class="bg-[#11192C] text-xs font-mono text-white border border-indigo-500/40 rounded-lg px-2.5 py-1">
+                                <option value="30">θ = π/6 (+30°)</option>
+                                <option value="45">θ = π/4 (+45°)</option>
+                                <option value="60">θ = π/3 (+60°)</option>
+                                <option value="90">θ = π/2 (+90°)</option>
+                                <option value="-30">θ = -π/6 (-30°)</option>
+                                <option value="-90">θ = -π/2 (-90°)</option>
+                            </select>
+                        </div>
+                        <div id="p3_calc_output" class="font-mono text-[11px] bg-[#060913] p-3 rounded-lg border border-slate-800 text-slate-200 overflow-x-auto">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             PAGE 4 : TRAVAIL DEMANDÉ — SOLUTION COMPLÈTE DÉTAILLÉE + SIMULATEUR 3D
+             ===================================================================== -->
+        <section id="section-page4" class="tp-page-section space-y-8">
+            <div class="flex items-center justify-between border-b border-emerald-500/30 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 font-display font-bold text-xs rounded-lg">PAGE 4 / 4</span>
+                    <h2 class="font-display font-bold text-base sm:text-lg text-white tracking-tight">
+                        3. Travail Demandé — Résolution Détaillée, Scripts MATLAB &amp; Représentation 3D
+                    </h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline">USTHB / FGE — TP CRM M1 AII — Page 4</span>
+            </div>
+
+            <!-- Original Page 4 Enoncé Box -->
+            <div class="academic-card p-6">
+                <div class="flex items-center justify-between border-b border-slate-700/70 pb-3 mb-4">
+                    <h3 class="font-display font-bold text-sm sm:text-base text-cyan-300">
+                        3. Travail demandé (Énoncé intégral de la Page 4)
+                    </h3>
+                    <span class="px-2.5 py-1 text-xs font-medium bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 rounded-md">Questions 1 à 4</span>
+                </div>
+                <ol class="space-y-3 text-sm text-slate-200 list-decimal pl-5">
+                    <li>
+                        Définir sous MATLAB les fonctions <code class="text-cyan-300 font-mono">R_x(teta)</code>, <code class="text-emerald-300 font-mono">R_y(teta)</code>, et <code class="text-violet-300 font-mono">R_z(teta)</code>, matrices de rotations élémentaires autour des axes $x, y$ et $z$.
+                        <ul class="list-none pl-4 mt-1.5 space-y-1 text-slate-300 text-xs sm:text-sm">
+                            <li><strong class="text-cyan-400 font-mono">a)</strong> Calculer <code class="text-white font-mono">R_x(pi/6)</code>, <code class="text-white font-mono">R_y(pi/4)</code>, et <code class="text-white font-mono">R_z(pi/2)</code>.</li>
+                            <li><strong class="text-cyan-400 font-mono">b)</strong> Calculer <code class="text-white font-mono">R_x(-pi/6)</code> et <code class="text-white font-mono">R_z(-pi/2)</code>. Que remarquez-vous ?</li>
+                            <li><strong class="text-cyan-400 font-mono">c)</strong> Vérifier que les colonnes des trois matrices <code class="text-white font-mono">R_x(pi/6)</code>, <code class="text-white font-mono">R_y(pi/4)</code>, et <code class="text-white font-mono">R_z(pi/2)</code> ont une norme égale à 1 (tapez <code class="text-amber-300 font-mono">« help norm »</code> sous MATLAB) et qu'elles sont orthogonales deux à deux (pour le produit scalaire taper <code class="text-amber-300 font-mono">« help dot »</code> sous MATLAB). Comment peut-on vérifier que $R$ est bien une matrice de rotation ?</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Écrire une fonction MATLAB appelée <code class="text-amber-300 font-mono">A = TransHom(R, t)</code>, qui prend en entrée la matrice de rotation $3\times 3$ $R$ <span class="text-xs text-slate-400">(imprimée $2\times 3$ par coquille dans l'énoncé)</span> et le vecteur de translation $3\times 1$ $t$, et renvoie la matrice de transformation homogène $4\times 4$ $A$.
+                    </li>
+                    <li>
+                        Utiliser les fonctions développées aux questions 1 et 2 pour déterminer la matrice de transformation homogène <code class="text-cyan-300 font-mono">A1</code> correspondant à une rotation autour de l'axe $y$ d'un angle $\beta = \pi/3$ suivie d'une translation le long de l'axe $x$ et le long de l'axe $z$ d'une longueur $dx = 2\text{ m}$ et $dz = 1\text{ m}$ respectivement.
+                    </li>
+                    <li>
+                        Soit <code class="text-violet-300 font-mono">p = (0, 0, 1, 1)'</code> un vecteur écrit en coordonnées homogènes. Déterminer le vecteur <code class="text-emerald-300 font-mono">p1</code> transformé à travers la matrice <code class="text-cyan-300 font-mono">A1</code> trouvée à la question 3. Représenter les deux vecteurs <code class="text-violet-300 font-mono">p</code> et <code class="text-emerald-300 font-mono">p1</code> graphiquement (taper <code class="text-amber-300 font-mono">« help plot3 »</code> sous MATLAB).
+                    </li>
+                </ol>
+            </div>
+
+            <!-- ==============================================================
+                 SOLUTION QUESTION 1 (Fonctions R_x, R_y, R_z + 1.a, 1.b, 1.c)
+                 ============================================================== -->
+            <div class="academic-card-blue p-6 space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-500/30 pb-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 bg-blue-600 text-white font-display font-bold text-xs rounded-md">QUESTION 1</span>
+                        <h3 class="font-display font-bold text-base sm:text-lg text-white">
+                            Programmation de <code class="text-cyan-300 font-mono">R_x(teta)</code>, <code class="text-emerald-300 font-mono">R_y(teta)</code>, <code class="text-violet-300 font-mono">R_z(teta)</code> &amp; Propriétés de $SO(3)$
+                        </h3>
+                    </div>
+                    <button onclick="copyCodeBlock('code-q1-funcs')" class="pixel-pill-btn px-3 py-1.5 text-xs">Copier les 3 fonctions</button>
+                </div>
+
+                <!-- The 3 MATLAB Function Files -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="code-q1-funcs">
+                    <!-- R_x.m -->
+                    <div class="bg-[#060913] border border-rose-500/30 rounded-xl overflow-hidden">
+                        <div class="bg-rose-950/40 px-3.5 py-2 border-b border-rose-500/30 flex justify-between items-center font-mono text-xs">
+                            <span class="text-rose-300 font-semibold">R_x.m</span>
+                            <span class="text-[11px] text-slate-400">Rotation Axe X</span>
+                        </div>
+                        <pre class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-blue-400">function</span> Rx = R_x(teta)
+<span class="text-slate-500">% Matrice de rotation elementaire 3x3 autour de l'axe X</span>
+<span class="text-slate-500">% teta : angle de rotation en radians</span>
+    c = cos(teta);
+    s = sin(teta);
+    Rx = [1,  0,  0;
+          0,  c, -s;
+          0,  s,  c];
+<span class="text-blue-400">end</span></code></pre>
+                    </div>
+
+                    <!-- R_y.m -->
+                    <div class="bg-[#060913] border border-emerald-500/30 rounded-xl overflow-hidden">
+                        <div class="bg-emerald-950/40 px-3.5 py-2 border-b border-emerald-500/30 flex justify-between items-center font-mono text-xs">
+                            <span class="text-emerald-300 font-semibold">R_y.m</span>
+                            <span class="text-[11px] text-slate-400">Rotation Axe Y</span>
+                        </div>
+                        <pre class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-blue-400">function</span> Ry = R_y(teta)
+<span class="text-slate-500">% Matrice de rotation elementaire 3x3 autour de l'axe Y</span>
+<span class="text-slate-500">% teta : angle de rotation en radians</span>
+    c = cos(teta);
+    s = sin(teta);
+    Ry = [ c,  0,  s;
+           0,  1,  0;
+          -s,  0,  c];
+<span class="text-blue-400">end</span></code></pre>
+                    </div>
+
+                    <!-- R_z.m -->
+                    <div class="bg-[#060913] border border-cyan-500/30 rounded-xl overflow-hidden">
+                        <div class="bg-cyan-950/40 px-3.5 py-2 border-b border-cyan-500/30 flex justify-between items-center font-mono text-xs">
+                            <span class="text-cyan-300 font-semibold">R_z.m</span>
+                            <span class="text-[11px] text-slate-400">Rotation Axe Z</span>
+                        </div>
+                        <pre class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-blue-400">function</span> Rz = R_z(teta)
+<span class="text-slate-500">% Matrice de rotation elementaire 3x3 autour de l'axe Z</span>
+<span class="text-slate-500">% teta : angle de rotation en radians</span>
+    c = cos(teta);
+    s = sin(teta);
+    Rz = [c, -s,  0;
+          s,  c,  0;
+          0,  0,  1];
+<span class="text-blue-400">end</span></code></pre>
+                    </div>
+                </div>
+
+                <!-- Sub-question 1.a -->
+                <div class="bg-[#090F1E] border border-blue-500/25 rounded-xl p-5 space-y-4">
+                    <h4 class="font-display font-bold text-cyan-300 text-sm sm:text-base">
+                        Question 1.a) Évaluation analytique et numérique de $R_x(\pi/6)$, $R_y(\pi/4)$ et $R_z(\pi/2)$
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-300">
+                        À partir des valeurs trigonométriques exactes $\cos(\pi/6) = \frac{\sqrt{3}}{2} \approx 0.8660$, $\sin(\pi/6) = \frac{1}{2} = 0.5000$, $\cos(\pi/4) = \sin(\pi/4) = \frac{\sqrt{2}}{2} \approx 0.7071$, et $\cos(\pi/2) = 0, \sin(\pi/2) = 1$ :
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-center text-xs sm:text-sm">
+                        <div class="bg-[#060913] p-4 rounded-xl border border-rose-500/25">
+                            <div class="text-rose-300 font-display font-semibold mb-2">Rotation $R_x(\pi/6)$ ($\theta = +30^\circ$)</div>
+                            $$R_x\left(\frac{\pi}{6}\right) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \frac{\sqrt{3}}{2} & -\frac{1}{2} \\ 0 & \frac{1}{2} & \frac{\sqrt{3}}{2} \end{bmatrix} \approx \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.8660 & -0.5000 \\ 0 & 0.5000 & 0.8660 \end{bmatrix}$$
+                        </div>
+                        <div class="bg-[#060913] p-4 rounded-xl border border-emerald-500/25">
+                            <div class="text-emerald-300 font-display font-semibold mb-2">Rotation $R_y(\pi/4)$ ($\theta = +45^\circ$)</div>
+                            $$R_y\left(\frac{\pi}{4}\right) = \begin{bmatrix} \frac{\sqrt{2}}{2} & 0 & \frac{\sqrt{2}}{2} \\ 0 & 1 & 0 \\ -\frac{\sqrt{2}}{2} & 0 & \frac{\sqrt{2}}{2} \end{bmatrix} \approx \begin{bmatrix} 0.7071 & 0 & 0.7071 \\ 0 & 1 & 0 \\ -0.7071 & 0 & 0.7071 \end{bmatrix}$$
+                        </div>
+                        <div class="bg-[#060913] p-4 rounded-xl border border-cyan-500/25">
+                            <div class="text-cyan-300 font-display font-semibold mb-2">Rotation $R_z(\pi/2)$ ($\theta = +90^\circ$)</div>
+                            $$R_z\left(\frac{\pi}{2}\right) = \begin{bmatrix} 0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-question 1.b -->
+                <div class="bg-[#090F1E] border border-violet-500/30 rounded-xl p-5 space-y-4">
+                    <h4 class="font-display font-bold text-violet-300 text-sm sm:text-base">
+                        Question 1.b) Calcul de $R_x(-\pi/6)$ et $R_z(-\pi/2)$ — Observation et propriété d'inversion
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center text-xs sm:text-sm">
+                        <div class="bg-[#060913] p-4 rounded-xl border border-violet-500/25">
+                            <div class="text-rose-300 font-display font-semibold mb-2">$R_x(-\pi/6)$ ($\theta = -30^\circ$)</div>
+                            $$R_x\left(-\frac{\pi}{6}\right) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.8660 & +0.5000 \\ 0 & -0.5000 & 0.8660 \end{bmatrix} = \left[R_x\left(\frac{\pi}{6}\right)\right]^T$$
+                        </div>
+
+                        <div class="bg-[#060913] p-4 rounded-xl border border-violet-500/25">
+                            <div class="text-cyan-300 font-display font-semibold mb-2">$R_z(-\pi/2)$ ($\theta = -90^\circ$)</div>
+                            $$R_z\left(-\frac{\pi}{2}\right) = \begin{bmatrix} 0 & +1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix} = \left[R_z\left(\frac{\pi}{2}\right)\right]^T$$
+                        </div>
+                    </div>
+
+                    <div class="bg-[#10162F] border-l-4 border-emerald-400 p-4 rounded-r-xl space-y-2">
+                        <h5 class="font-display font-semibold text-emerald-300 text-xs sm:text-sm">
+                            Observation mathématique et interprétation cinématique :
+                        </h5>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                            On constate que les matrices associées aux angles opposés $R_x(-\pi/6)$ et $R_z(-\pi/2)$ sont exactement égales aux <strong>matrices transposées</strong> (ainsi qu'aux <strong>matrices inverses</strong>) de $R_x(\pi/6)$ et $R_z(\pi/2)$ :
+                            $$R(-\theta) = R(\theta)^T = R(\theta)^{-1} \iff R(\theta) \cdot R(-\theta) = I_3$$
+                        </p>
+                        <ul class="text-xs sm:text-sm text-slate-300 space-y-1 list-disc pl-5">
+                            <li><strong>Justification analytique :</strong> Par parité du cosinus ($\cos(-\theta) = \cos\theta$), les éléments diagonaux demeurent inchangés ; par imparité du sinus ($\sin(-\theta) = -\sin\theta$), les éléments hors-diagonale changent de signe, ce qui correspond exactement à la transposition de la matrice.</li>
+                            <li><strong>Conséquence en robotique :</strong> Effectuer une rotation d'angle $-\theta$ annule la rotation d'angle $+\theta$. L'appartenance au groupe orthogonal permet d'inverser toute matrice de rotation par simple transposition ($R^{-1} = R^T$), sans aucun coût de calcul d'inversion matricielle en temps réel.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sub-question 1.c -->
+                <div class="bg-[#090F1E] border border-emerald-500/30 rounded-xl p-5 space-y-4">
+                    <h4 class="font-display font-bold text-emerald-300 text-sm sm:text-base">
+                        Question 1.c) Vérification de la norme (<code class="text-amber-300 font-mono">norm</code>), du produit scalaire (<code class="text-amber-300 font-mono">dot</code>) et caractérisation de $SO(3)$
+                    </h4>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="bg-[#060913] border border-slate-800 rounded-xl overflow-hidden">
+                            <div class="bg-slate-900/90 px-3.5 py-2 border-b border-slate-800 font-mono text-xs text-cyan-300 font-semibold">
+                                Extrait MATLAB — Question 1.c
+                            </div>
+                            <pre class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-slate-500">% Verification sur Rx = R_x(pi/6)</span>
+Rx = R_x(pi/6);
+
+<span class="text-slate-500">% 1) Norme des vecteurs colonnes (doit valoir 1) :</span>
+n1 = norm(Rx(:,1))  <span class="text-emerald-400">% -> 1.0000</span>
+n2 = norm(Rx(:,2))  <span class="text-emerald-400">% -> 1.0000</span>
+n3 = norm(Rx(:,3))  <span class="text-emerald-400">% -> 1.0000</span>
+
+<span class="text-slate-500">% 2) Produits scalaires deux a deux (doivent valoir 0) :</span>
+p12 = dot(Rx(:,1), Rx(:,2)) <span class="text-emerald-400">% -> 0</span>
+p13 = dot(Rx(:,1), Rx(:,3)) <span class="text-emerald-400">% -> 0</span>
+p23 = dot(Rx(:,2), Rx(:,3)) <span class="text-emerald-400">% -> 0</span>
+
+<span class="text-slate-500">% 3) Test global d'appartenance a SO(3) :</span>
+ortho_test = Rx' * Rx       <span class="text-emerald-400">% -> eye(3)</span>
+det_test   = det(Rx)        <span class="text-emerald-400">% -> +1.0000</span></code></pre>
+                        </div>
+
+                        <div class="bg-[#10162F] border-l-4 border-cyan-400 p-4 rounded-r-xl space-y-2.5 flex flex-col justify-center">
+                            <h5 class="font-display font-semibold text-cyan-300 text-xs sm:text-sm">
+                                Comment peut-on vérifier que $R$ est bien une matrice de rotation ?
+                            </h5>
+                            <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                                Une matrice carrée $R \in \mathbb{R}^{3\times 3}$ est une matrice de rotation valide si et seulement si elle appartient au <strong>Groupe Spécial Orthogonal $SO(3)$</strong>, défini par deux conditions nécessaires et suffisantes :
+                            </p>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-[#070B16] p-2.5 rounded-lg border border-emerald-500/30">
+                                    <span class="text-emerald-400 font-semibold">1. Condition d'orthonormalité : $R^T \cdot R = R \cdot R^T = I_3$</span>
+                                    <p class="text-slate-300 mt-0.5">Les trois vecteurs colonnes $(\vec{s}, \vec{n}, \vec{a})$ sont unitaires ($\|\vec{c}_i\| = 1$) et orthogonaux deux à deux ($\vec{c}_i \cdot \vec{c}_j = 0$ pour $i \neq j$), ce qui assure la conservation des distances et des angles.</p>
+                                </div>
+                                <div class="bg-[#070B16] p-2.5 rounded-lg border border-amber-500/30">
+                                    <span class="text-amber-300 font-semibold">2. Condition d'orientation directe : $\det(R) = +1$</span>
+                                    <p class="text-slate-300 mt-0.5">Toute matrice orthogonale vérifie $\det(R) = \pm 1$. Le cas $\det(R) = -1$ correspond à une <em>réflexion miroir</em> (symétrie impropre inversant la règle de la main droite : $\vec{s} \wedge \vec{n} = -\vec{a}$). Une rotation physique exige donc strictement $\det(R) = +1$ ($\vec{s} \wedge \vec{n} = +\vec{a}$).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==============================================================
+                 SOLUTION QUESTION 2 (Fonction TransHom(R, t))
+                 ============================================================== -->
+            <div class="academic-card-blue p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-500/30 pb-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 bg-violet-600 text-white font-display font-bold text-xs rounded-md">QUESTION 2</span>
+                        <h3 class="font-display font-bold text-base sm:text-lg text-white">
+                            Programmation de la fonction <code class="text-amber-300 font-mono">A = TransHom(R, t)</code>
+                        </h3>
+                    </div>
+                    <button onclick="copyCodeBlock('code-q2-func')" class="pixel-pill-btn px-3 py-1.5 text-xs">Copier TransHom.m</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-7 bg-[#060913] border border-violet-500/30 rounded-xl overflow-hidden" id="code-q2-func">
+                        <div class="bg-violet-950/40 px-3.5 py-2 border-b border-violet-500/30 flex justify-between items-center font-mono text-xs">
+                            <span class="text-violet-300 font-semibold">TransHom.m</span>
+                            <span class="text-[11px] text-slate-400">Matrice Homogène 4×4</span>
+                        </div>
+                        <pre class="p-4 text-xs sm:text-sm font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-blue-400">function</span> A = TransHom(R, t)
+<span class="text-slate-500">% TransHom : Assemble la matrice de transformation homogene 4x4</span>
+<span class="text-slate-500">% R : matrice de rotation 3x3</span>
+<span class="text-slate-500">% t : vecteur de translation 3x1</span>
+
+    t = t(:); <span class="text-slate-500">% assure que t est bien un vecteur colonne 3x1</span>
+    A = [R,       t;
+         0, 0, 0, 1];
+<span class="text-blue-400">end</span></code></pre>
+                    </div>
+
+                    <div class="lg:col-span-5 bg-[#10162F] border-l-4 border-violet-400 p-4 rounded-r-xl space-y-2">
+                        <h4 class="font-display font-semibold text-violet-300 text-sm">
+                            Structure par blocs et précaution sur la dimension de $t$
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            La fonction assemble par blocs la matrice de rotation $R$ de dimension $(3\times 3)$ (mentionnée $2\times 3$ par coquille dans l'énoncé), le vecteur colonne de translation $t$ $(3\times 1)$ et la ligne homogène $\begin{bmatrix} 0 & 0 & 0 & 1 \end{bmatrix}$.
+                        </p>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                            L'écriture <code class="text-emerald-300 font-mono">t = t(:);</code> garantit que même si le vecteur $t$ est passé en ligne <code class="text-cyan-300 font-mono">[2, 0, 1]</code>, MATLAB le reformate en colonne $(3\times 1)$ avant la concaténation horizontale avec $R$.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==============================================================
+                 SOLUTION QUESTION 3 (Matrice homogène A1)
+                 ============================================================== -->
+            <div class="academic-card-blue p-6 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-500/30 pb-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 bg-cyan-600 text-white font-display font-bold text-xs rounded-md">QUESTION 3</span>
+                        <h3 class="font-display font-bold text-base sm:text-lg text-white">
+                            Détermination de la matrice homogène <code class="text-cyan-300 font-mono">A1</code> ($\beta = \pi/3$ autour de $y$, $dx = 2\text{ m}, dz = 1\text{ m}$)
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="bg-[#10162F] border-l-4 border-amber-400 p-4 rounded-r-xl space-y-3">
+                    <h4 class="font-display font-semibold text-amber-300 text-sm">
+                        Analyse de la composition : Repère fixe vs Repère mobile
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                        La question demande d'utiliser directement les fonctions des questions 1 et 2 pour construire la matrice <code class="text-cyan-300 font-mono">A1</code> associée à une rotation d'angle $\beta = \pi/3$ autour de l'axe $y$ et une translation de composantes $dx = 2\text{ m}$, $dy = 0\text{ m}$ et $dz = 1\text{ m}$ :
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-[#070B16] p-3.5 rounded-xl border border-emerald-500/40 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-emerald-400 font-display font-semibold text-xs">1. Construction directe (Référentiel fixe $R_0$)</span>
+                                <span class="px-2 py-0.5 text-[10px] bg-emerald-950 text-emerald-300 rounded font-mono">TransHom(R, t)</span>
+                            </div>
+                            <p class="text-xs text-slate-300">
+                                En appelant <code class="text-white font-mono">A1 = TransHom(R_y(pi/3), [2; 0; 1])</code>, la rotation et la translation sont combinées dans le repère de référence fixe : $A_1 = \text{Trans}(2,0,1) \cdot \text{Rot}(y, \pi/3)$.
+                            </p>
+                            <pre class="text-xs font-mono text-emerald-300 bg-[#050811] p-2.5 rounded-lg"><code>beta = pi/3;
+R = R_y(beta);
+t = [2; 0; 1];
+A1 = TransHom(R, t)</code></pre>
+                        </div>
+
+                        <div class="bg-[#070B16] p-3.5 rounded-xl border border-violet-500/40 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-violet-300 font-display font-semibold text-xs">2. Post-multiplication (Référentiel mobile courant)</span>
+                                <span class="px-2 py-0.5 text-[10px] bg-violet-950 text-violet-300 rounded font-mono">Rot · Trans</span>
+                            </div>
+                            <p class="text-xs text-slate-300">
+                                Si la translation $(dx=2, dz=1)$ est effectuée le long des nouveaux axes du repère déjà tourné de $\pi/3$, on post-multiplie : $A_{1,\text{mob}} = \text{Rot}(y, \pi/3) \cdot \text{Trans}(2,0,1)$.
+                            </p>
+                            <pre class="text-xs font-mono text-violet-300 bg-[#050811] p-2.5 rounded-lg"><code>A_rot   = TransHom(R_y(pi/3), [0;0;0]);
+A_trans = TransHom(eye(3),    [2;0;1]);
+A1_mob  = A_rot * A_trans</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytical & Numerical Results for A1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                    <div class="bg-[#060913] p-4 rounded-xl border border-cyan-500/30 text-center space-y-2">
+                        <div class="text-xs font-display font-semibold text-cyan-300">
+                            Expression de $A_1 = \text{TransHom}(R_y(\pi/3), [2; 0; 1])$
+                        </div>
+                        <p class="text-xs text-slate-400">
+                            Avec $\cos(\pi/3) = \frac{1}{2} = 0.5000$ et $\sin(\pi/3) = \frac{\sqrt{3}}{2} \approx 0.8660$ :
+                        </p>
+                        $$A_1 = \begin{bmatrix} \cos(\pi/3) & 0 & \sin(\pi/3) & 2 \\ 0 & 1 & 0 & 0 \\ -\sin(\pi/3) & 0 & \cos(\pi/3) & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 0.5000 & 0 & 0.8660 & 2.0000 \\ 0 & 1.0000 & 0 & 0 \\ -0.8660 & 0 & 0.5000 & 1.0000 \\ 0 & 0 & 0 & 1.0000 \end{bmatrix}$$
+                    </div>
+
+                    <div class="bg-[#060913] p-4 rounded-xl border border-violet-500/30 text-center space-y-2">
+                        <div class="text-xs font-display font-semibold text-violet-300">
+                            Cas de la post-multiplication : $A_{1,\text{mob}} = \text{Rot}(y,\pi/3)\cdot\text{Trans}(2,0,1)$
+                        </div>
+                        <p class="text-xs text-slate-400">
+                            Le vecteur de translation est projeté par $R_y(\pi/3)$ : $t' = R_y(\pi/3)\cdot[2, 0, 1]^T$
+                        </p>
+                        $$A_{1,\text{mob}} = \begin{bmatrix} 0.5000 & 0 & 0.8660 & 1.8660 \\ 0 & 1.0000 & 0 & 0 \\ -0.8660 & 0 & 0.5000 & -1.2321 \\ 0 & 0 & 0 & 1.0000 \end{bmatrix}$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==============================================================
+                 SOLUTION QUESTION 4 (Vecteur transformé p1 = A1 * p & plot3)
+                 ============================================================== -->
+            <div class="academic-card-blue p-6 space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-500/30 pb-3">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 bg-emerald-600 text-white font-display font-bold text-xs rounded-md">QUESTION 4</span>
+                        <h3 class="font-display font-bold text-base sm:text-lg text-white">
+                            Calcul du vecteur transformé <code class="text-emerald-300 font-mono">p1 = A1 * p</code> et Représentation 3D (<code class="text-amber-300 font-mono">plot3</code>)
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-7 bg-[#060913] p-5 rounded-xl border border-emerald-500/30 space-y-3">
+                        <h4 class="font-display font-semibold text-emerald-300 text-xs sm:text-sm">
+                            Détail analytique du produit matriciel $p_1 = A_1 \cdot p$ avec $p = [0, 0, 1, 1]^T$ :
+                        </h4>
+                        <div class="overflow-x-auto">
+                            $$p_1 = A_1 \cdot p = \begin{bmatrix} 0.5000 & 0 & 0.8660 & 2 \\ 0 & 1 & 0 & 0 \\ -0.8660 & 0 & 0.5000 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} \frac{\sqrt{3}}{2} + 2 \\ 0 \\ \frac{1}{2} + 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 2.8660 \\ 0 \\ 1.5000 \\ 1.0000 \end{bmatrix}$$
+                        </div>
+                        <p class="text-xs text-slate-300 bg-[#0B1325] p-3 rounded-lg border border-blue-500/25 leading-relaxed">
+                            <strong>Vérification géométrique :</strong> Le point initial $p(0, 0, 1)$ situé à $1\text{ m}$ sur l'axe $Z$ subit d'abord une rotation de $+60^\circ$ autour de $Y$, ce qui l'amène en $(\sin 60^\circ, 0, \cos 60^\circ) = (0.8660, 0, 0.5000)$, puis subit la translation $(+2, 0, +1)$ pour atteindre $p_1(2.8660, 0, 1.5000)$.
+                        </p>
+                    </div>
+
+                    <!-- MATLAB Code for Question 4 (plot3) -->
+                    <div class="lg:col-span-5 bg-[#060913] border border-cyan-500/30 rounded-xl overflow-hidden">
+                        <div class="bg-cyan-950/40 px-3.5 py-2 border-b border-cyan-500/30 flex justify-between items-center font-mono text-xs">
+                            <span class="text-cyan-300 font-semibold">Représentation 3D sous MATLAB (plot3)</span>
+                            <button onclick="copyCodeBlock('code-q4-plot')" class="text-[11px] text-amber-300 hover:underline">Copier</button>
+                        </div>
+                        <pre id="code-q4-plot" class="p-3.5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed"><code><span class="text-slate-500">% 4) Calcul du vecteur transforme p1 et trace 3D</span>
+p  = [0; 0; 1; 1];
+p1 = A1 * p
+
+figure(<span class="text-amber-300">'Name'</span>, <span class="text-amber-300">'TP1 CRM - Question 4'</span>);
+hold on; grid on; axis equal;
+
+<span class="text-slate-500">% Vecteur initial p (en bleu)</span>
+plot3([0, p(1)], [0, p(2)], [0, p(3)], <span class="text-amber-300">'b-o'</span>, ...
+      <span class="text-amber-300">'LineWidth'</span>, 2, <span class="text-amber-300">'MarkerFaceColor'</span>, <span class="text-amber-300">'b'</span>);
+
+<span class="text-slate-500">% Vecteur transforme p1 (en rouge)</span>
+plot3([0, p1(1)], [0, p1(2)], [0, p1(3)], <span class="text-amber-300">'r-s'</span>, ...
+      <span class="text-amber-300">'LineWidth'</span>, 2, <span class="text-amber-300">'MarkerFaceColor'</span>, <span class="text-amber-300">'r'</span>);
+
+xlabel(<span class="text-amber-300">'X (m)'</span>); ylabel(<span class="text-amber-300">'Y (m)'</span>); zlabel(<span class="text-amber-300">'Z (m)'</span>);
+title(<span class="text-amber-300">'Representation 3D des vecteurs p et p1'</span>);
+legend(<span class="text-amber-300">'Vecteur p'</span>, <span class="text-amber-300">'Vecteur p1'</span>);
+view(135, 25);</code></pre>
+                    </div>
+                </div>
+
+                <!-- INTERACTIVE 3D SIMULATOR FOR QUESTION 3 & 4 -->
+                <div class="academic-card-violet p-5 sm:p-6 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-violet-500/30 pb-3">
+                        <div>
+                            <h4 class="font-display font-bold text-sm sm:text-base text-cyan-300">Simulateur 3D Interactif — Visualisation de <code class="text-white font-mono">plot3(p, p1)</code></h4>
+                            <p class="text-xs text-slate-300">Faites glisser la souris sur le graphe 3D pour orienter la caméra • Ajustez $\beta, dx, dy, dz$ pour observer la transformation</p>
+                        </div>
+                        <button onclick="resetQ4Simulator()" class="pixel-pill-btn px-3.5 py-1.5 text-xs">Réinitialiser ($\beta=\pi/3, dx=2, dz=1$)</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        <div class="lg:col-span-7 flex flex-col items-center">
+                            <div class="relative w-full bg-[#060913] border border-indigo-500/35 rounded-xl overflow-hidden shadow-inner">
+                                <canvas id="canvasPlot3" width="600" height="380" class="w-full h-[320px] sm:h-[360px] cursor-grab active:cursor-grabbing"></canvas>
+                                <div class="absolute top-3 left-3 bg-[#090E1C]/90 border border-slate-700/80 px-3 py-2 rounded-lg text-[11px] font-mono space-y-1 pointer-events-none">
+                                    <div class="flex items-center gap-2"><span class="w-3 h-1 bg-purple-400 inline-block rounded"></span> <span class="text-purple-300">p initial = [0, 0, 1, 1]ᵀ</span></div>
+                                    <div class="flex items-center gap-2"><span class="w-3 h-1 bg-amber-400 inline-block rounded"></span> <span class="text-amber-300">p_rot = R_y(β)·p (rotation seule)</span></div>
+                                    <div class="flex items-center gap-2"><span class="w-3 h-1 bg-emerald-400 inline-block rounded"></span> <span id="sim_p1_legend" class="text-emerald-300 font-semibold">p1 final = [2.87, 0.00, 1.50, 1]ᵀ</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 space-y-4 text-xs">
+                            <div class="bg-[#090E1C] p-4 rounded-xl border border-indigo-500/25 space-y-3">
+                                <div class="text-violet-300 font-display font-semibold text-xs border-b border-slate-800 pb-1.5">
+                                    Paramètres de la matrice homogène $A_1$ :
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1 font-mono">
+                                        <span>Angle $\beta$ (Axe Y) :</span>
+                                        <span id="sim_beta_label" class="text-cyan-300 font-semibold">60° (π/3 rad)</span>
+                                    </div>
+                                    <input type="range" id="sim_beta" min="-180" max="180" step="5" value="60" class="w-full accent-cyan-400" oninput="updateQ4Simulator()">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1 font-mono">
+                                        <span>Translation $dx$ (Axe X) :</span>
+                                        <span id="sim_dx_label" class="text-amber-300 font-semibold">2.0 m</span>
+                                    </div>
+                                    <input type="range" id="sim_dx" min="-3" max="4" step="0.5" value="2.0" class="w-full accent-amber-400" oninput="updateQ4Simulator()">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1 font-mono">
+                                        <span>Translation $dy$ (Axe Y) :</span>
+                                        <span id="sim_dy_label" class="text-amber-300 font-semibold">0.0 m</span>
+                                    </div>
+                                    <input type="range" id="sim_dy" min="-3" max="3" step="0.5" value="0.0" class="w-full accent-amber-400" oninput="updateQ4Simulator()">
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1 font-mono">
+                                        <span>Translation $dz$ (Axe Z) :</span>
+                                        <span id="sim_dz_label" class="text-amber-300 font-semibold">1.0 m</span>
+                                    </div>
+                                    <input type="range" id="sim_dz" min="-2" max="3" step="0.5" value="1.0" class="w-full accent-amber-400" oninput="updateQ4Simulator()">
+                                </div>
+                            </div>
+
+                            <div class="bg-[#060913] p-3.5 rounded-xl border border-slate-800 space-y-2">
+                                <div class="text-cyan-300 font-display font-semibold text-xs">Évaluation numérique en temps réel :</div>
+                                <pre id="sim_matrix_output" class="text-[11px] font-mono text-slate-200 overflow-x-auto leading-snug"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==============================================================
+                 COMPLETE UNIFIED MATLAB SCRIPT & SIMULATED COMMAND WINDOW
+                 ============================================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Complete Single MATLAB Script with authentic M1 AII student comments -->
+                <div class="lg:col-span-7 academic-card overflow-hidden">
+                    <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-400/80 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-400/80 inline-block"></span>
+                            <span class="font-mono font-semibold text-xs sm:text-sm text-white ml-2">TP1_CRM_Solution_Complete.m</span>
+                        </div>
+                        <button onclick="copyAllMatlabCode()" class="pixel-pill-btn px-3 py-1 text-xs">Copier le script complet</button>
+                    </div>
+                    <pre id="full-matlab-code" class="p-4 text-xs font-mono text-slate-200 bg-[#060913] overflow-x-auto leading-relaxed max-h-[560px]"><code>% =========================================================================
+% USTHB - FGE - Departement d'Automatique (M1 AII)
+% Module : TP Commande du Robot Manipulateur (CRM)
+% TP N°01 : Programmation des transformations homogenes
+% Realise par : Dahane Ahmed Lamine & Tabbi Meriem
+% =========================================================================
+clear; clc; close all;
+
+%% Question 1.a : Calcul de R_x(pi/6), R_y(pi/4) et R_z(pi/2)
+disp('--- Question 1.a : Matrices de rotation elementaires ---');
+Rx_pi6 = R_x(pi/6)
+Ry_pi4 = R_y(pi/4)
+Rz_pi2 = R_z(pi/2)
+
+%% Question 1.b : Calcul de R_x(-pi/6) et R_z(-pi/2)
+disp('--- Question 1.b : Angles opposes ---');
+Rx_moins_pi6 = R_x(-pi/6)
+Rz_moins_pi2 = R_z(-pi/2)
+
+% On remarque que R(-teta) est egale a la transposee (et a l'inverse) de R(teta) :
+% Rx_moins_pi6 == Rx_pi6' et Rz_moins_pi2 == Rz_pi2'
+
+%% Question 1.c : Verification de la norme des colonnes et de l'orthogonalite
+disp('--- Question 1.c : Verification de norm() et dot() ---');
+
+% Pour R_x(pi/6) :
+norm_Rx = [norm(Rx_pi6(:,1)), norm(Rx_pi6(:,2)), norm(Rx_pi6(:,3))]
+dot_Rx  = [dot(Rx_pi6(:,1), Rx_pi6(:,2)), ...
+           dot(Rx_pi6(:,1), Rx_pi6(:,3)), ...
+           dot(Rx_pi6(:,2), Rx_pi6(:,3))]
+
+% Pour R_y(pi/4) :
+norm_Ry = [norm(Ry_pi4(:,1)), norm(Ry_pi4(:,2)), norm(Ry_pi4(:,3))]
+dot_Ry  = [dot(Ry_pi4(:,1), Ry_pi4(:,2)), ...
+           dot(Ry_pi4(:,1), Ry_pi4(:,3)), ...
+           dot(Ry_pi4(:,2), Ry_pi4(:,3))]
+
+% Pour R_z(pi/2) :
+norm_Rz = [norm(Rz_pi2(:,1)), norm(Rz_pi2(:,2)), norm(Rz_pi2(:,3))]
+dot_Rz  = [dot(Rz_pi2(:,1), Rz_pi2(:,2)), ...
+           dot(Rz_pi2(:,1), Rz_pi2(:,3)), ...
+           dot(Rz_pi2(:,2), Rz_pi2(:,3))]
+
+% Pour verifier que R est bien une matrice de rotation (groupe SO(3)),
+% on verifie que R'*R = I_3 et que det(R) = +1 :
+det_Rx = det(Rx_pi6)
+det_Ry = det(Ry_pi4)
+det_Rz = det(Rz_pi2)
+
+%% Question 2 & 3 : Matrice de transformation homogene A1
+% Rotation autour de y d'angle beta = pi/3 suivie de dx = 2m et dz = 1m (dy = 0)
+disp('--- Question 3 : Matrice homogene A1 ---');
+beta = pi/3;
+R = R_y(beta);
+t = [2; 0; 1];
+
+A1 = TransHom(R, t)
+
+%% Question 4 : Vecteur transforme p1 et representation graphique avec plot3
+disp('--- Question 4 : Calcul de p1 = A1 * p ---');
+p  = [0; 0; 1; 1];
+p1 = A1 * p
+
+% Trace 3D des vecteurs p et p1 a partir de l'origine (0,0,0)
+figure('Color', 'w', 'Name', 'TP1 CRM - Question 4');
+hold on; grid on; axis equal;
+
+plot3([0, p(1)],  [0, p(2)],  [0, p(3)],  'b-o', 'LineWidth', 2, 'MarkerFaceColor', 'b');
+plot3([0, p1(1)], [0, p1(2)], [0, p1(3)], 'r-s', 'LineWidth', 2, 'MarkerFaceColor', 'r');
+
+xlabel('Axe X (m)');
+ylabel('Axe Y (m)');
+zlabel('Axe Z (m)');
+title('Representation 3D des vecteurs p et p1 = A1 * p');
+legend('Vecteur initial p (0, 0, 1)', 'Vecteur transforme p1 (2.866, 0, 1.5)', 'Location', 'best');
+view(135, 25);
+
+%% =========================================================================
+%  Fonctions locales demandees aux questions 1 et 2
+%  =========================================================================
+function Rx = R_x(teta)
+    % Rotation elementaire 3x3 autour de l'axe x
+    Rx = [1,         0,          0;
+          0, cos(teta), -sin(teta);
+          0, sin(teta),  cos(teta)];
+end
+
+function Ry = R_y(teta)
+    % Rotation elementaire 3x3 autour de l'axe y
+    Ry = [ cos(teta), 0, sin(teta);
+                   0, 1,         0;
+          -sin(teta), 0, cos(teta)];
+end
+
+function Rz = R_z(teta)
+    % Rotation elementaire 3x3 autour de l'axe z
+    Rz = [cos(teta), -sin(teta), 0;
+          sin(teta),  cos(teta), 0;
+                  0,          0, 1];
+end
+
+function A = TransHom(R, t)
+    % Matrice de transformation homogene 4x4 a partir de R (3x3) et t (3x1)
+    t = t(:);
+    A = [R,       t;
+         0, 0, 0, 1];
+end</code></pre>
+                </div>
+
+                <!-- Simulated MATLAB Command Window Output -->
+                <div class="lg:col-span-5 academic-card-violet overflow-hidden">
+                    <div class="bg-slate-900/90 px-4 py-3 border-b border-violet-500/30 flex items-center justify-between">
+                        <span class="font-display font-bold text-xs sm:text-sm text-cyan-300">MATLAB Command Window</span>
+                        <span class="text-[11px] font-mono text-emerald-400">&gt;&gt; Sortie Console</span>
+                    </div>
+                    <pre class="p-4 text-xs font-mono text-emerald-300 bg-[#050811] overflow-x-auto leading-relaxed max-h-[560px]"><code>&gt;&gt; TP1_CRM_Solution_Complete
+--- Question 1.a : Matrices de rotation elementaires ---
+Rx_pi6 =
+    1.0000         0         0
+         0    0.8660   -0.5000
+         0    0.5000    0.8660
+
+Ry_pi4 =
+    0.7071         0    0.7071
+         0    1.0000         0
+   -0.7071         0    0.7071
+
+Rz_pi2 =
+    0.0000   -1.0000         0
+    1.0000    0.0000         0
+         0         0    1.0000
+
+--- Question 1.b : Angles opposes ---
+Rx_moins_pi6 =
+    1.0000         0         0
+         0    0.8660    0.5000
+         0   -0.5000    0.8660
+
+Rz_moins_pi2 =
+    0.0000    1.0000         0
+   -1.0000    0.0000         0
+         0         0    1.0000
+
+--- Question 1.c : Verification de norm() et dot() ---
+norm_Rx =
+    1.0000    1.0000    1.0000
+dot_Rx =
+     0     0     0
+
+norm_Ry =
+    1.0000    1.0000    1.0000
+dot_Ry =
+     0     0     0
+
+norm_Rz =
+    1.0000    1.0000    1.0000
+dot_Rz =
+     0     0     0
+
+det_Rx =
+    1.0000
+det_Ry =
+    1.0000
+det_Rz =
+    1.0000
+
+--- Question 3 : Matrice homogene A1 ---
+A1 =
+    0.5000         0    0.8660    2.0000
+         0    1.0000         0         0
+   -0.8660         0    0.5000    1.0000
+         0         0         0    1.0000
+
+--- Question 4 : Calcul de p1 = A1 * p ---
+p1 =
+    2.8660
+         0
+    1.5000
+    1.0000
+&gt;&gt; </code></pre>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-[#050811] py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+                <span class="text-cyan-400 font-display font-bold">USTHB • FGE</span>
+                <span>— Département d'Automatique — Master 1 Automatique et Informatique Industrielle (M1 AII)</span>
+            </div>
+            <div class="text-violet-300 font-medium">
+                Réalisé par : Dahane Ahmed Lamine &amp; Tabbi Meriem • Encadré par : Pr. MENANI
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT ENGINE -->
+    <script>
+        /* =====================================================================
+           1. PAGE NAVIGATION TABS
+           ===================================================================== */
+        function switchPage(pageId) {
+            const sections = {
+                page1: document.getElementById('section-page1'),
+                page2: document.getElementById('section-page2'),
+                page3: document.getElementById('section-page3'),
+                page4: document.getElementById('section-page4')
+            };
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+            const activeTab = document.getElementById('tab-' + pageId);
+            if (activeTab) activeTab.classList.add('tab-active');
+
+            if (pageId === 'all') {
+                Object.values(sections).forEach(sec => sec.classList.remove('hidden'));
+            } else {
+                Object.entries(sections).forEach(([key, sec]) => {
+                    if (key === pageId) {
+                        sec.classList.remove('hidden');
+                    } else {
+                        sec.classList.add('hidden');
+                    }
+                });
+            }
+
+            drawFig1();
+            updateQ4Simulator();
+        }
+
+        /* =====================================================================
+           2. CLIPBOARD HELPER
+           ===================================================================== */
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2600);
+        }
+
+        function copyTextToClipboard(text, label) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(label || 'Code copié dans le presse-papiers !');
+            } catch (err) {
+                showToast('Erreur lors de la copie.');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function copyAllMatlabCode() {
+            const code = document.getElementById('full-matlab-code').innerText;
+            copyTextToClipboard(code, 'Script TP1_CRM_Solution_Complete.m copié !');
+        }
+
+        function copyCodeBlock(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                copyTextToClipboard(el.innerText, 'Code MATLAB copié !');
+            }
+        }
+
+        /* =====================================================================
+           3. PAGE 1 : INTERACTIVE FIGURE 1 (3D POINT P(px, py, pz))
+           ===================================================================== */
+        function drawFig1() {
+            const canvas = document.getElementById('canvasFig1');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const px = parseFloat(document.getElementById('fig1_px').value);
+            const py = parseFloat(document.getElementById('fig1_py').value);
+            const pz = parseFloat(document.getElementById('fig1_pz').value);
+
+            document.getElementById('fig1_px_val').textContent = px.toFixed(1);
+            document.getElementById('fig1_py_val').textContent = py.toFixed(1);
+            document.getElementById('fig1_pz_val').textContent = pz.toFixed(1);
+
+            ctx.clearRect(0, 0, w, h);
+
+            const ox = 85;
+            const oy = 135;
+            const scale = 22;
+
+            function proj(x, y, z) {
+                const sx = ox - x * scale * 0.65 + y * scale * 1.0;
+                const sy = oy + x * scale * 0.55 - z * scale * 1.0;
+                return { x: sx, y: sy };
+            }
+
+            const endX = proj(4.2, 0, 0);
+            const endY = proj(0, 5.2, 0);
+            const endZ = proj(0, 0, 4.5);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#60a5fa';
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(endX.x, endX.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(endY.x, endY.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(endZ.x, endZ.y); ctx.stroke();
+
+            ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText('X', endX.x - 14, endX.y + 8);
+            ctx.fillText('Y', endY.x + 6, endY.y + 4);
+            ctx.fillText('Z', endZ.x - 5, endZ.y - 6);
+
+            const pX = proj(px, 0, 0);
+            const pY = proj(0, py, 0);
+            const pXY = proj(px, py, 0);
+            const pXYZ = proj(px, py, pz);
+
+            ctx.setLineDash([3, 3]);
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = '#94a3b8';
+
+            ctx.beginPath();
+            ctx.moveTo(pX.x, pX.y);
+            ctx.lineTo(pXY.x, pXY.y);
+            ctx.lineTo(pY.x, pY.y);
+            ctx.moveTo(ox, oy);
+            ctx.lineTo(pXY.x, pXY.y);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#34d399';
+            ctx.beginPath();
+            ctx.moveTo(pXY.x, pXY.y);
+            ctx.lineTo(pXYZ.x, pXYZ.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#c084fc';
+            ctx.beginPath();
+            ctx.moveTo(ox, oy);
+            ctx.lineTo(pXYZ.x, pXYZ.y);
+            ctx.stroke();
+
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.arc(pXYZ.x, pXYZ.y, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.font = '11px "JetBrains Mono", monospace';
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillText('px', (pY.x + pXY.x) / 2 + 6, (pY.y + pXY.y) / 2 + 4);
+            ctx.fillText('py', (pX.x + pXY.x) / 2 - 8, (pX.y + pXY.y) / 2 + 13);
+            ctx.fillStyle = '#34d399';
+            ctx.fillText('pz', pXY.x + 5, (pXY.y + pXYZ.y) / 2);
+
+            ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.fillStyle = '#f472b6';
+            ctx.fillText(`P(${px},${py},${pz})`, pXYZ.x + 6, pXYZ.y - 5);
+        }
+
+        /* =====================================================================
+           4. PAGE 3 : QUICK ROTATION MATRIX CALCULATOR
+           ===================================================================== */
+        function updateP3Calculator() {
+            const deg = parseFloat(document.getElementById('p3_angle_preset').value);
+            const rad = deg * Math.PI / 180;
+            const c = Math.cos(rad);
+            const s = Math.sin(rad);
+
+            const fmt = (v) => (Math.abs(v) < 1e-10 ? ' 0.0000' : (v >= 0 ? ' ' + v.toFixed(4) : v.toFixed(4)));
+
+            const html = `
+<div class="text-cyan-300 font-semibold mb-1.5">Pour θ = ${deg}° (${(rad / Math.PI).toFixed(2)}π rad) : cos(θ) = ${c.toFixed(4)}, sin(θ) = ${s.toFixed(4)}</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-2">
+  <div class="bg-[#0B1120] p-2.5 rounded-lg border border-rose-500/25">
+    <span class="text-rose-400 font-semibold">R_x(${deg}°) =</span>
+    <pre class="mt-1">[ 1.0000  0.0000  0.0000]
+[ 0.0000 ${fmt(c)} ${fmt(-s)}]
+[ 0.0000 ${fmt(s)} ${fmt(c)}]</pre>
+  </div>
+  <div class="bg-[#0B1120] p-2.5 rounded-lg border border-emerald-500/25">
+    <span class="text-emerald-400 font-semibold">R_y(${deg}°) =</span>
+    <pre class="mt-1">[${fmt(c)}  0.0000 ${fmt(s)}]
+[ 0.0000  1.0000  0.0000]
+[${fmt(-s)}  0.0000 ${fmt(c)}]</pre>
+  </div>
+  <div class="bg-[#0B1120] p-2.5 rounded-lg border border-cyan-500/25">
+    <span class="text-cyan-400 font-semibold">R_z(${deg}°) =</span>
+    <pre class="mt-1">[${fmt(c)} ${fmt(-s)}  0.0000]
+[${fmt(s)} ${fmt(c)}  0.0000]
+[ 0.0000  0.0000  1.0000]</pre>
+  </div>
+</div>`;
+            document.getElementById('p3_calc_output').innerHTML = html;
+        }
+
+        /* =====================================================================
+           5. PAGE 4 : INTERACTIVE 3D PLOT3 SIMULATOR (QUESTION 3 & 4)
+           ===================================================================== */
+        let camYaw = 0.65;
+        let camPitch = 0.38;
+        let isDragging3D = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+
+        function initPlot3Interaction() {
+            const canvas = document.getElementById('canvasPlot3');
+            if (!canvas) return;
+
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging3D = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging3D = false;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging3D) return;
+                const dx = e.clientX - lastMouseX;
+                const dy = e.clientY - lastMouseY;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                camYaw += dx * 0.01;
+                camPitch = Math.max(-1.2, Math.min(1.2, camPitch + dy * 0.01));
+                updateQ4Simulator();
+            });
+
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging3D = true;
+                    lastMouseX = e.touches[0].clientX;
+                    lastMouseY = e.touches[0].clientY;
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                isDragging3D = false;
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isDragging3D || e.touches.length !== 1) return;
+                const dx = e.touches[0].clientX - lastMouseX;
+                const dy = e.touches[0].clientY - lastMouseY;
+                lastMouseX = e.touches[0].clientX;
+                lastMouseY = e.touches[0].clientY;
+                camYaw += dx * 0.01;
+                camPitch = Math.max(-1.2, Math.min(1.2, camPitch + dy * 0.01));
+                updateQ4Simulator();
+            }, { passive: true });
+        }
+
+        function resetQ4Simulator() {
+            document.getElementById('sim_beta').value = 60;
+            document.getElementById('sim_dx').value = 2.0;
+            document.getElementById('sim_dy').value = 0.0;
+            document.getElementById('sim_dz').value = 1.0;
+            camYaw = 0.65;
+            camPitch = 0.38;
+            updateQ4Simulator();
+        }
+
+        function updateQ4Simulator() {
+            const betaDeg = parseFloat(document.getElementById('sim_beta').value);
+            const dx = parseFloat(document.getElementById('sim_dx').value);
+            const dy = parseFloat(document.getElementById('sim_dy').value);
+            const dz = parseFloat(document.getElementById('sim_dz').value);
+
+            const betaRad = betaDeg * Math.PI / 180;
+            const c = Math.cos(betaRad);
+            const s = Math.sin(betaRad);
+
+            document.getElementById('sim_beta_label').textContent = `${betaDeg}° (${(betaRad / Math.PI).toFixed(2)}π rad)`;
+            document.getElementById('sim_dx_label').textContent = `${dx.toFixed(1)} m`;
+            document.getElementById('sim_dy_label').textContent = `${dy.toFixed(1)} m`;
+            document.getElementById('sim_dz_label').textContent = `${dz.toFixed(1)} m`;
+
+            const p = { x: 0, y: 0, z: 1 };
+            const pRot = { x: s, y: 0, z: c };
+            const p1 = {
+                x: s + dx,
+                y: dy,
+                z: c + dz
+            };
+
+            document.getElementById('sim_p1_legend').textContent = `p1 final = [${p1.x.toFixed(2)}, ${p1.y.toFixed(2)}, ${p1.z.toFixed(2)}, 1]ᵀ`;
+
+            const fmt = (v) => (Math.abs(v) < 1e-10 ? ' 0.0000' : (v >= 0 ? ' ' + v.toFixed(4) : v.toFixed(4)));
+            document.getElementById('sim_matrix_output').textContent =
+`A1 = [ ${fmt(c)}   0.0000  ${fmt(s)}  ${fmt(dx)} ]
+     [  0.0000   1.0000   0.0000  ${fmt(dy)} ]
+     [ ${fmt(-s)}   0.0000  ${fmt(c)}  ${fmt(dz)} ]
+     [  0.0000   0.0000   0.0000   1.0000 ]
+
+p1 = A1 * [0; 0; 1; 1] = [${p1.x.toFixed(4)}; ${p1.y.toFixed(4)}; ${p1.z.toFixed(4)}; 1.0000]`;
+
+            const canvas = document.getElementById('canvasPlot3');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.42;
+            const cy = h * 0.65;
+            const scale = 58;
+
+            function project3D(x, y, z) {
+                const x1 = x * Math.cos(camYaw) - y * Math.sin(camYaw);
+                const y1 = x * Math.sin(camYaw) + y * Math.cos(camYaw);
+                const z1 = z;
+                const screenX = cx + x1 * scale;
+                const screenY = cy - z1 * Math.cos(camPitch) * scale + y1 * Math.sin(camPitch) * scale;
+                return { x: screenX, y: screenY };
+            }
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.16)';
+            for (let g = -3; g <= 4; g++) {
+                const a1 = project3D(g, -3, 0);
+                const a2 = project3D(g, 4, 0);
+                ctx.beginPath(); ctx.moveTo(a1.x, a1.y); ctx.lineTo(a2.x, a2.y); ctx.stroke();
+
+                const b1 = project3D(-3, g, 0);
+                const b2 = project3D(4, g, 0);
+                ctx.beginPath(); ctx.moveTo(b1.x, b1.y); ctx.lineTo(b2.x, b2.y); ctx.stroke();
+            }
+
+            const O = project3D(0, 0, 0);
+            const axisX = project3D(4.2, 0, 0);
+            const axisY = project3D(0, 3.5, 0);
+            const axisZ = project3D(0, 0, 3.2);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#f43f5e';
+            ctx.beginPath(); ctx.moveTo(O.x, O.y); ctx.lineTo(axisX.x, axisX.y); ctx.stroke();
+            ctx.fillStyle = '#f43f5e'; ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.fillText('X (m)', axisX.x + 5, axisX.y + 4);
+
+            ctx.strokeStyle = '#38bdf8';
+            ctx.beginPath(); ctx.moveTo(O.x, O.y); ctx.lineTo(axisY.x, axisY.y); ctx.stroke();
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText('Y (m)', axisY.x + 5, axisY.y + 4);
+
+            ctx.strokeStyle = '#a855f7';
+            ctx.beginPath(); ctx.moveTo(O.x, O.y); ctx.lineTo(axisZ.x, axisZ.y); ctx.stroke();
+            ctx.fillStyle = '#a855f7';
+            ctx.fillText('Z (m)', axisZ.x - 10, axisZ.y - 8);
+
+            const ptP = project3D(p.x, p.y, p.z);
+            const ptPRot = project3D(pRot.x, pRot.y, pRot.z);
+            const ptP1 = project3D(p1.x, p1.y, p1.z);
+            const ptP1Floor = project3D(p1.x, p1.y, 0);
+
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+            ctx.beginPath();
+            ctx.moveTo(ptP1.x, ptP1.y);
+            ctx.lineTo(ptP1Floor.x, ptP1Floor.y);
+            ctx.lineTo(O.x, O.y);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(ptPRot.x, ptPRot.y);
+            ctx.lineTo(ptP1.x, ptP1.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#fbbf24';
+            ctx.beginPath(); ctx.moveTo(O.x, O.y); ctx.lineTo(ptPRot.x, ptPRot.y); ctx.stroke();
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath(); ctx.arc(ptPRot.x, ptPRot.y, 4, 0, Math.PI * 2); ctx.fill();
+
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = '#c084fc';
+            ctx.beginPath(); ctx.moveTo(O.x, O.y); ctx.lineTo(ptP.x, ptP.y); ctx.stroke();
+            ctx.fillStyle = '#c084fc';
+            ctx.beginPath(); ctx.arc(ptP.x, ptP.y, 5.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillText('p(0,0,1)', ptP.x - 58, ptP.y - 6);
+
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = '#10b981';
+            ctx.beginPath(); ctx.moveTo(O.x, O.y); ctx.lineTo(ptP1.x, ptP1.y); ctx.stroke();
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath(); ctx.arc(ptP1.x, ptP1.y, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillText(`p1(${p1.x.toFixed(2)}, ${p1.y.toFixed(1)}, ${p1.z.toFixed(2)})`, ptP1.x + 8, ptP1.y - 6);
+        }
+
+        window.onload = function () {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+            drawFig1();
+            updateP3Calculator();
+            initPlot3Interaction();
+            updateQ4Simulator();
+        };
+    </script>
+</body>
+</html>
